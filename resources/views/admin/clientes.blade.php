@@ -104,6 +104,11 @@
                                                 <i class="fas fa-edit me-1"></i>
                                                 Editar
                                             </button>
+                                            <button type="button" class="btn btn-danger btn-sm" 
+                                                    onclick="eliminarCliente({{ $cliente->id }})">
+                                                <i class="fas fa-trash me-1"></i>
+                                                Eliminar
+                                            </button>
                                         </div>
                                     </td>
                                 </tr>
@@ -364,6 +369,37 @@ function actualizarFilaCliente(clienteId, cliente) {
     }
     contactoHtml += '</div>';
     fila.find('td:eq(3)').html(contactoHtml);
+}
+
+function eliminarCliente(clienteId) {
+    if (!confirm('¿Seguro que deseas eliminar este cliente?')) {
+        return;
+    }
+
+    $.ajax({
+        url: `{{ url('api/clientes') }}/${clienteId}`,
+        method: 'DELETE',
+        success: function(response) {
+            if (response.success) {
+                // Eliminar la fila de la tabla
+                $(`#cliente-row-${clienteId}`).remove();
+
+                // Quitar de clientesData
+                clientesData = clientesData.filter(c => c.id !== clienteId);
+
+                // Si ya no hay clientes, recargar para mostrar el mensaje vacío
+                if (clientesData.length === 0) {
+                    location.reload();
+                }
+
+                showSuccess(response.message);
+            }
+        },
+        error: function(xhr) {
+            const message = xhr.responseJSON?.message || 'Error al eliminar el cliente';
+            showError(message);
+        }
+    });
 }
 
 function agregarFilaCliente(cliente) {

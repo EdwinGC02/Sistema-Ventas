@@ -43,7 +43,7 @@
     </div>
 
     <div class="col-lg-3 col-md-6 mb-3">
-        <div class="admin-stat-card" style="background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 100%);">
+        <div class="admin-stat-card" style="background: linear-gradient(135deg, #ff0008ff 0%, #eac674ff 100%);">
             <div class="stat-icon">
                 <i class="fas fa-users"></i>
             </div>

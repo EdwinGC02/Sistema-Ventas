@@ -35,5 +35,6 @@ Route::prefix('api')->name('api.')->group(function () {
     // Clientes
     Route::post('/clientes', [ClienteController::class, 'store'])->name('clientes.store');
     Route::put('/clientes/{cliente}', [ClienteController::class, 'update'])->name('clientes.update');
+    Route::delete('clientes/{cliente}', [ClienteController::class, 'destroy'])->name('api.clientes.destroy');
     Route::patch('/clientes/{cliente}/toggle', [ClienteController::class, 'toggleActivo'])->name('clientes.toggle');
 });

@@ -108,6 +108,31 @@ class ClienteController extends Controller
         }
     }
 
+    public function destroy(Cliente $cliente)
+    {
+        try {
+            // Verificar si el cliente tiene ventas asociadas
+            if ($cliente->ventas()->exists()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'No se puede eliminar el cliente porque tiene ventas registradas'
+                ], 400);
+            }
+
+            $cliente->delete();
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Cliente eliminado correctamente'
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Error al eliminar el cliente'
+            ], 500);
+        }
+    }
+
     public function toggleActivo(Cliente $cliente)
     {
         try {

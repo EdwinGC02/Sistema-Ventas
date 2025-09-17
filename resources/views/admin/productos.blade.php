@@ -122,10 +122,10 @@
                     <input type="hidden" id="producto-edit-id">
                     
                     <div class="mb-3">
-                        <label for="producto-nombre" class="form-label fw-bold">
+                        <label for="producto-nombre-input" class="form-label fw-bold">
                             Nombre del Producto <span class="text-danger">*</span>
                         </label>
-                        <input type="text" class="form-control" id="producto-nombre" name="nombre" required>
+                        <input type="text" class="form-control" id="producto-nombre-input" name="nombre" required>
                     </div>
                     
                     <div class="row">
@@ -181,7 +181,7 @@
                     
                     <div class="mb-3">
                         <label class="form-label fw-bold">Producto:</label>
-                        <p class="form-control-plaintext" id="producto-nombre"></p>
+                        <p class="form-control-plaintext" id="producto-nombre-stock"></p>
                     </div>
                     
                     <div class="mb-3">
@@ -234,7 +234,7 @@ function mostrarModalProducto(productoId = null) {
         if (producto) {
             $('#modal-producto-title').html('<i class="fas fa-edit me-2"></i>Editar Producto');
             $('#producto-edit-id').val(producto.id);
-            $('#producto-nombre').val(producto.nombre);
+            $('#producto-nombre-input').val(producto.nombre);
             $('#producto-precio').val(producto.precio);
             $('#producto-stock-inicial').val(producto.stock);
         }
@@ -282,7 +282,7 @@ function eliminarProducto(productoId, nombreProducto) {
 
 function mostrarModalStock(id, nombre, stockActual) {
     $('#producto-id').val(id);
-    $('#producto-nombre').text(nombre);
+    $('#producto-nombre-stock').text(nombre);
     $('#stock-actual').text(stockActual);
     $('#nuevo-stock').val(stockActual);
     $('#modalStock').modal('show');
@@ -334,7 +334,7 @@ $('#form-producto').on('submit', function(e) {
     const btnGuardar = $('#btn-guardar-producto');
     
     const data = {
-        nombre: $('#producto-nombre').val().trim(),
+        nombre: $('#producto-nombre-input').val().trim(),
         precio: parseFloat($('#producto-precio').val()),
         stock: parseInt($('#producto-stock-inicial').val())
     };
