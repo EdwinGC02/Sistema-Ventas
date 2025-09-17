@@ -26,8 +26,10 @@ Route::prefix('admin')->name('admin.')->group(function () {
 
 // API Routes para AJAX
 Route::prefix('api')->name('api.')->group(function () {
-    // Productos
+    // Productos - CRUD completo
+    Route::post('/productos', [ProductoController::class, 'store'])->name('productos.store');
     Route::put('/productos/{producto}', [ProductoController::class, 'update'])->name('productos.update');
+    Route::delete('/productos/{producto}', [ProductoController::class, 'destroy'])->name('productos.destroy');
     Route::patch('/productos/{producto}/toggle', [ProductoController::class, 'toggleActivo'])->name('productos.toggle');
     
     // Clientes

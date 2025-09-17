@@ -227,6 +227,25 @@
             font-size: 0.9rem;
             opacity: 0.9;
         }
+
+        .cliente-option-section {
+            transition: all 0.3s ease;
+        }
+
+        .vista-previa-cliente {
+            background: linear-gradient(135deg, rgba(52, 152, 219, 0.1) 0%, rgba(39, 174, 96, 0.1) 100%);
+            border-left: 4px solid var(--secondary-color);
+        }
+
+        .form-check-input:checked {
+            background-color: var(--secondary-color);
+            border-color: var(--secondary-color);
+        }
+
+        .cliente-preview-icon {
+            color: var(--secondary-color);
+            margin-right: 0.25rem;
+        }
     </style>
 
     @stack('styles')
@@ -234,10 +253,10 @@
 <body>
     <nav class="navbar navbar-expand-lg navbar-dark" style="background-color: var(--primary-color);">
         <div class="container-fluid">
-            <a class="navbar-brand" href="{{ route('pos.index') }}">
+            <h1 class="navbar-brand">
                 <i class="fas fa-cash-register me-2"></i>
                 Sistema de Ventas
-            </a>
+            </h1>
             
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
                 <span class="navbar-toggler-icon"></span>
@@ -245,14 +264,17 @@
             
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav ms-auto">
+                    @if(request()->is('pos'))
                     <li class="nav-item">
                         <a class="nav-link {{ request()->is('pos*') ? 'active' : '' }}" href="{{ route('pos.index') }}">
                             <i class="fas fa-shopping-cart me-1"></i>
                             Punto de Venta
                         </a>
                     </li>
+                    @endif
+                    @if(request()->is('admin*'))
                     <li class="nav-item dropdown">
-                        <a class="nav-link dropdown-toggle {{ request()->is('admin*') ? 'active' : '' }}" href="#" id="adminDropdown" role="button" data-bs-toggle="dropdown">
+                        <a class="nav-link dropdown-toggle active" href="#" id="adminDropdown" role="button" data-bs-toggle="dropdown">
                             <i class="fas fa-cog me-1"></i>
                             Administración
                         </a>
@@ -271,6 +293,7 @@
                             </a></li>
                         </ul>
                     </li>
+                    @endif
                 </ul>
             </div>
         </div>

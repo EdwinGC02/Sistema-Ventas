@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Carbon\Carbon;
 
 class Venta extends Model
 {
@@ -27,6 +28,18 @@ class Venta extends Model
         'fecha_venta' => 'datetime',
     ];
 
+    // Establecer zona horaria colombiana para todas las fechas
+    protected static function boot()
+    {
+        parent::boot();
+        
+        static::creating(function ($model) {
+            if (!$model->fecha_venta) {
+                $model->fecha_venta = Carbon::now('America/Bogota');
+            }
+        });
+    }
+
     public function cliente()
     {
         return $this->belongsTo(Cliente::class);
@@ -40,9 +53,12 @@ class Venta extends Model
     public function scopePorFecha($query, $fechaInicio, $fechaFin = null)
     {
         if ($fechaFin) {
-            return $query->whereBetween('fecha_venta', [$fechaInicio, $fechaFin]);
+            return $query->whereBetween('fecha_venta', [
+                Carbon::parse($fechaInicio)->startOfDay(),
+                Carbon::parse($fechaFin)->endOfDay()
+            ]);
         }
-        return $query->whereDate('fecha_venta', $fechaInicio);
+        return $query->whereDate('fecha_venta', Carbon::parse($fechaInicio));
     }
 
     public function scopePorTipoCliente($query, $tipo)

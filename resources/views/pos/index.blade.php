@@ -70,15 +70,92 @@
                     </div>
                 </div>
 
-                <!-- Selección de Cliente -->
+                <!-- Selección/Creación de Cliente -->
                 <div class="mb-3" id="cliente-section" style="display: none;">
-                    <label for="cliente_id" class="form-label fw-bold">Cliente:</label>
-                    <select class="form-select" name="cliente_id" id="cliente_id">
-                        <option value="">Seleccionar cliente...</option>
-                        @foreach($clientes as $cliente)
-                        <option value="{{ $cliente->id }}">{{ $cliente->nombre }} - {{ $cliente->documento }}</option>
-                        @endforeach
-                    </select>
+                    <label class="form-label fw-bold">Cliente:</label>
+                    
+                    <!-- Opciones de cliente -->
+                    <div class="mb-3">
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input" type="radio" name="opcion_cliente" id="cliente_existente" value="existente" checked>
+                            <label class="form-check-label" for="cliente_existente">
+                                Cliente Existente
+                            </label>
+                        </div>
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input" type="radio" name="opcion_cliente" id="cliente_nuevo" value="nuevo">
+                            <label class="form-check-label" for="cliente_nuevo">
+                                Nuevo Cliente
+                            </label>
+                        </div>
+                    </div>
+
+                    <!-- Selección de cliente existente -->
+                    <div id="seccion-cliente-existente">
+                        <select class="form-select" name="cliente_id" id="cliente_id">
+                            <option value="">Seleccionar cliente...</option>
+                            @foreach($clientes as $cliente)
+                            <option value="{{ $cliente->id }}" 
+                                    data-nombre="{{ $cliente->nombre }}"
+                                    data-documento="{{ $cliente->documento }}"
+                                    data-email="{{ $cliente->email }}"
+                                    data-telefono="{{ $cliente->telefono }}"
+                                    data-direccion="{{ $cliente->direccion }}">
+                                {{ $cliente->nombre }} - {{ $cliente->documento }}
+                            </option>
+                            @endforeach
+                        </select>
+                        <small class="text-muted">
+                            <i class="fas fa-info-circle me-1"></i>
+                            Selecciona un cliente de la lista
+                        </small>
+                    </div>
+
+                    <!-- Formulario de cliente nuevo -->
+                    <div id="seccion-cliente-nuevo" style="display: none;">
+                        <div class="row">
+                            <div class="col-md-6 mb-2">
+                                <input type="text" class="form-control form-control-sm" 
+                                       name="cliente_nombre" id="cliente_nombre" 
+                                       placeholder="Nombre completo *" required>
+                            </div>
+                            <div class="col-md-6 mb-2">
+                                <input type="text" class="form-control form-control-sm" 
+                                       name="cliente_documento" id="cliente_documento" 
+                                       placeholder="Documento *" required>
+                            </div>
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-md-6 mb-2">
+                                <input type="email" class="form-control form-control-sm" 
+                                       name="cliente_email" id="cliente_email" 
+                                       placeholder="Email (opcional)">
+                            </div>
+                            <div class="col-md-6 mb-2">
+                                <input type="tel" class="form-control form-control-sm" 
+                                       name="cliente_telefono" id="cliente_telefono" 
+                                       placeholder="Teléfono (opcional)">
+                            </div>
+                        </div>
+                        
+                        <div class="mb-2">
+                            <input type="text" class="form-control form-control-sm" 
+                                   name="cliente_direccion" id="cliente_direccion" 
+                                   placeholder="Dirección (opcional)">
+                        </div>
+                        
+                        <small class="text-muted">
+                            <i class="fas fa-info-circle me-1"></i>
+                            Si el cliente ya existe, sus datos serán actualizados
+                        </small>
+                    </div>
+
+                    <!-- Vista previa del cliente seleccionado -->
+                    <div id="vista-previa-cliente" class="mt-3 p-2 bg-light rounded" style="display: none;">
+                        <small class="text-muted d-block mb-1"><strong>Cliente seleccionado:</strong></small>
+                        <div id="datos-cliente-preview" class="small"></div>
+                    </div>
                 </div>
 
                 <!-- Items del Carrito -->
@@ -144,7 +221,39 @@ $(document).ready(function() {
             $('#cliente-section').slideDown();
         } else {
             $('#cliente-section').slideUp();
+            limpiarDatosCliente();
+        }
+    });
+
+    // Cambio de opción de cliente (existente/nuevo)
+    $('input[name="opcion_cliente"]').change(function() {
+        if ($(this).val() === 'existente') {
+            $('#seccion-cliente-existente').slideDown();
+            $('#seccion-cliente-nuevo').slideUp();
+            limpiarFormularioNuevoCliente();
+        } else {
+            $('#seccion-cliente-existente').slideUp();
+            $('#seccion-cliente-nuevo').slideDown();
             $('#cliente_id').val('');
+            $('#vista-previa-cliente').hide();
+        }
+    });
+
+    // Selección de cliente existente
+    $('#cliente_id').change(function() {
+        const clienteId = $(this).val();
+        if (clienteId) {
+            const option = $(this).find('option:selected');
+            const datosCliente = {
+                nombre: option.data('nombre'),
+                documento: option.data('documento'),
+                email: option.data('email') || '',
+                telefono: option.data('telefono') || '',
+                direccion: option.data('direccion') || ''
+            };
+            mostrarVistaPrevia(datosCliente);
+        } else {
+            $('#vista-previa-cliente').hide();
         }
     });
 
@@ -293,13 +402,28 @@ function procesarVenta() {
     }
 
     const tipoCliente = $('input[name="tipo_cliente"]:checked').val();
-    const clienteId = $('#cliente_id').val();
     const observaciones = $('#observaciones').val();
 
-    // Validaciones
-    if (tipoCliente === 'factura' && !clienteId) {
-        showError('Debe seleccionar un cliente para facturación');
-        return;
+    // Validaciones para venta con factura
+    if (tipoCliente === 'factura') {
+        const opcionCliente = $('input[name="opcion_cliente"]:checked').val();
+        
+        if (opcionCliente === 'existente') {
+            const clienteId = $('#cliente_id').val();
+            if (!clienteId) {
+                showError('Debe seleccionar un cliente de la lista');
+                return;
+            }
+        } else {
+            // Cliente nuevo
+            const nombre = $('#cliente_nombre').val().trim();
+            const documento = $('#cliente_documento').val().trim();
+            
+            if (!nombre || !documento) {
+                showError('Debe completar el nombre y documento del cliente');
+                return;
+            }
+        }
     }
 
     const btnProcesar = $('#btn-procesar-venta');
@@ -307,13 +431,29 @@ function procesarVenta() {
 
     const data = {
         tipo_cliente: tipoCliente,
-        cliente_id: clienteId || null,
         productos: carrito.map(item => ({
             id: item.id,
             cantidad: item.cantidad
         })),
         observaciones: observaciones
     };
+
+    // Agregar datos del cliente si es venta con factura
+    if (tipoCliente === 'factura') {
+        const opcionCliente = $('input[name="opcion_cliente"]:checked').val();
+        
+        if (opcionCliente === 'existente') {
+            // Cliente existente - usar ID
+            data.cliente_existente_id = $('#cliente_id').val();
+        } else {
+            // Cliente nuevo - usar datos del formulario
+            data.cliente_nombre = $('#cliente_nombre').val().trim();
+            data.cliente_documento = $('#cliente_documento').val().trim();
+            data.cliente_email = $('#cliente_email').val().trim();
+            data.cliente_telefono = $('#cliente_telefono').val().trim();
+            data.cliente_direccion = $('#cliente_direccion').val().trim();
+        }
+    }
 
     $.ajax({
         url: '{{ route("pos.procesar-venta") }}',
@@ -379,10 +519,37 @@ function limpiarCarrito() {
 function resetearFormulario() {
     $('#tipo_mostrador').prop('checked', true);
     $('#cliente-section').hide();
-    $('#cliente_id').val('');
+    $('#cliente_existente').prop('checked', true);
+    $('#seccion-cliente-existente').show();
+    $('#seccion-cliente-nuevo').hide();
+    limpiarDatosCliente();
     $('#observaciones').val('');
     $('.is-invalid').removeClass('is-invalid');
     $('.invalid-feedback').remove();
+}
+
+function limpiarDatosCliente() {
+    $('#cliente_id').val('');
+    limpiarFormularioNuevoCliente();
+    $('#vista-previa-cliente').hide();
+}
+
+function limpiarFormularioNuevoCliente() {
+    $('#cliente_nombre').val('');
+    $('#cliente_documento').val('');
+    $('#cliente_email').val('');
+    $('#cliente_telefono').val('');
+    $('#cliente_direccion').val('');
+}
+
+function mostrarVistaPrevia(datosCliente) {
+    let html = `<strong>${datosCliente.nombre}</strong> - ${datosCliente.documento}`;
+    if (datosCliente.email) html += `<br>📧 ${datosCliente.email}`;
+    if (datosCliente.telefono) html += `<br>📞 ${datosCliente.telefono}`;
+    if (datosCliente.direccion) html += `<br>📍 ${datosCliente.direccion}`;
+    
+    $('#datos-cliente-preview').html(html);
+    $('#vista-previa-cliente').slideDown();
 }
 
 function actualizarStockProducto(productoId, nuevoStock) {

@@ -145,10 +145,9 @@
                     <div class="text-center py-4">
                         <i class="fas fa-chart-line fa-3x text-muted mb-3"></i>
                         <p class="text-muted">No hay ventas registradas aún</p>
-                        <a href="{{ route('pos.index') }}" class="btn btn-primary">
-                            <i class="fas fa-shopping-cart me-2"></i>
-                            Realizar Primera Venta
-                        </a>
+                        <p class="small text-muted">
+                            Ve a <strong>/pos</strong> para realizar la primera venta
+                        </p>
                     </div>
                 @endif
             </div>
@@ -168,25 +167,19 @@
             </div>
             <div class="card-body">
                 <div class="row">
-                    <div class="col-lg-3 col-md-6 mb-3">
-                        <a href="{{ route('pos.index') }}" class="btn btn-outline-primary btn-lg w-100 h-100">
-                            <i class="fas fa-cash-register fa-2x mb-2 d-block"></i>
-                            Punto de Venta
-                        </a>
-                    </div>
-                    <div class="col-lg-3 col-md-6 mb-3">
+                    <div class="col-lg-4 col-md-6 mb-3">
                         <a href="{{ route('admin.productos') }}" class="btn btn-outline-success btn-lg w-100 h-100">
                             <i class="fas fa-box fa-2x mb-2 d-block"></i>
                             Gestionar Productos
                         </a>
                     </div>
-                    <div class="col-lg-3 col-md-6 mb-3">
+                    <div class="col-lg-4 col-md-6 mb-3">
                         <a href="{{ route('admin.clientes') }}" class="btn btn-outline-info btn-lg w-100 h-100">
                             <i class="fas fa-users fa-2x mb-2 d-block"></i>
                             Gestionar Clientes
                         </a>
                     </div>
-                    <div class="col-lg-3 col-md-6 mb-3">
+                    <div class="col-lg-4 col-md-6 mb-3">
                         <a href="{{ route('admin.reportes') }}" class="btn btn-outline-warning btn-lg w-100 h-100">
                             <i class="fas fa-chart-bar fa-2x mb-2 d-block"></i>
                             Ver Reportes
