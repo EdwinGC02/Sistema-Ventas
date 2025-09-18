@@ -335,8 +335,17 @@ function actualizarCarrito() {
     const btnLimpiar = $('#btn-limpiar-carrito');
     const cartCount = $('#cart-count');
 
+    // Limpiar completamente el contenedor primero
+    cartItemsContainer.empty();
+
     if (carrito.length === 0) {
-        emptyCart.show();
+        // Mostrar carrito vacío
+        cartItemsContainer.html(`
+            <div class="text-center text-muted py-4" id="empty-cart">
+                <i class="fas fa-shopping-cart fa-3x mb-3 opacity-50"></i>
+                <p>El carrito está vacío</p>
+            </div>
+        `);
         totalesSection.hide();
         btnProcesar.prop('disabled', true);
         btnLimpiar.prop('disabled', true);
@@ -344,7 +353,7 @@ function actualizarCarrito() {
         return;
     }
 
-    emptyCart.hide();
+    // Construir HTML del carrito
     totalesSection.show();
     btnProcesar.prop('disabled', false);
     btnLimpiar.prop('disabled', false);
@@ -514,9 +523,20 @@ function procesarVenta() {
 function limpiarCarrito() {
     carrito = [];
     actualizarCarrito();
+    // Asegurar que se resetee todo visualmente
+    setTimeout(() => {
+        $('#totales-section').hide();
+        $('#btn-procesar-venta').prop('disabled', true);
+        $('#btn-limpiar-carrito').prop('disabled', true);
+        $('#cart-count').text('0');
+    }, 50);
 }
 
 function resetearFormulario() {
+    // Limpiar carrito primero
+    limpiarCarrito();
+    
+    // Resetear formulario
     $('#tipo_mostrador').prop('checked', true);
     $('#cliente-section').hide();
     $('#cliente_existente').prop('checked', true);
